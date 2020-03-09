@@ -131,20 +131,14 @@ class Producer(threading.Thread):
                 url_number = len(urls)
                 for index, url in enumerate(urls):
                     file_location = os.path.join(dir_path, '%d-%d.jpg' % (x, index + 1))
-                    pd_file_path = os.path.isfile(file_location)
-                    if pd_file_path == False:
-                        mylog.write('该漫画总共%d话,正在下载第 %d 话, 进度:%d/%d\n' % (page_number(page_url), x, index + 1, url_number))
-                        mylog.flush()
-                        self.image_queue.put({"image_url":url, "image_path": file_location})
-                    else:
-                        print(get_title(page_url) + '/%d-%d.jpg' % (x, index + 1) + '已存在！')
-                        mylog.write(get_title(page_url) + '/%d-%d.jpg' % (x, index + 1) + '已存在！\n')
-                        mylog.flush()
-            mylog.write("下载结束！\n")
+                    self.image_queue.put({"image_url":url, "image_path": file_location})
+                    # print(get_title(page_url) + '/%d-%d.jpg' % (x, index + 1) + '已存在！')
+                    # mylog.write(get_title(page_url) + '/%d-%d.jpg' % (x, index + 1) + '已存在！\n')
+                    # mylog.flush()
+            mylog.write("mylog文件正在调试中，敬请期待！\n")
             mylog.flush()
             mylog.close()
-            print("下载结束！")
-            input("输入任意值结束:")
+
 
 
 class Consumer(threading.Thread):
@@ -158,11 +152,15 @@ class Consumer(threading.Thread):
                 image_obj = self.image_queue.get()
                 image_url = image_obj.get("image_url")
                 image_path = image_obj.get("image_path")
-                try:
-                    request.urlretrieve(image_url, image_path)
-                    print(image_path + "下载完成！")
-                except:
-                    print(image_path+"下载失败！")
+                pd_file_path = os.path.isfile(image_path)
+                if pd_file_path == False:
+                    try:
+                        request.urlretrieve(image_url, image_path)
+                        print(image_path + "下载完成！")
+                    except:
+                        print(image_path+"下载失败！")
+                else:
+                    print(image_path+'已存在！')
             except:
                 break
 
@@ -171,7 +169,7 @@ def main():
     page_queue = queue.Queue(20)
     image_queue = queue.Queue(1000)
     print("""
-              崩坏3漫画爬虫 v 2.0.4 beta from Sufe.曲水
+              崩坏3漫画爬虫 v 2.1.0 beta from Sufe.曲水
             --------------------------------------------
               漫画序号                  标题
                 1001                 逃离长空篇
@@ -216,4 +214,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-# pyinstaller -F D:\\python爬虫\bh3-crawler\bh3-crawler_v2.0.4_beta.py
+# pyinstaller -F D:\\python爬虫\bh3-crawler\bh3-crawler_v2.1.0_beta.py
